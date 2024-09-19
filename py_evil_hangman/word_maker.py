@@ -23,8 +23,9 @@ class WordMakerBase:
         self.words = {} # Make sure that you understand dictionaries. They will be extremely useful for this project.
         with open(words_file) as wordfile:
             for line in wordfile:
-                word = line.strip()
+                word = line.strip().lower()
                 if len(word) > 0:
+                    # I don't think we need "True" as a value. We need the beginning of the function though to see whether to add a word or ignore an empty line
                     self.words[word] = True # I could have made this a set() instead.
 
     # This function should return the positions of guess_letter in word. For instance:
@@ -90,12 +91,22 @@ class WordMakerAI(WordMakerBase):
         # Optional for 'verbose' to pass, defaults to false if user doesn't input 'verbose'
         super().__init__(words_file, verbose)
 
+        # Preprocessing to use for reset function
+        # Group words by their length
+        self.words_group_by_length =defaultdict(set) # Automatically creates a set if key is missing
+        for word, value in self.words.items():
+            # key = word length, value = word(s) that meet criteria for word length
+            self.words_group_by_length[len(word)].add(word)
+
     def reset(self, word_length: int) -> None:
         # This function starts a new game with a word length of `word_length`. This will always be called before guess() or get_valid_word() are called.
         # You should try to make this function should be O(1). That is, you shouldn't have to process over the entire dictionary here (find somewhere else to preprocess it)
         # Your AI code should not call input() or print().
 
-        pass # TODO: implement this
+        # Narrow down dictionary to only include words with word_length. Convert dictionary to set.
+        # not sure how to make this 0(1) w/o preprocessing beforehand in __init__
+        self.word = ""
+        self.words = self.words_group_by_length[word_length]
 
     def get_valid_word(self) -> str:
         # Get a valid word in the active dictionary, to return when you lose
