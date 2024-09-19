@@ -15,7 +15,8 @@ Groupmate 1: TODO
 Groupmate 2: TODO
 """
 
-class WordMakerHuman():
+# Base class for common logic
+class WordMakerBase:
     def __init__(self, words_file, verbose):
         # we need to prompt the player for a word, then clear the screen so that player 2 doesn't see the word.
         self.verbose = verbose
@@ -25,6 +26,21 @@ class WordMakerHuman():
                 word = line.strip()
                 if len(word) > 0:
                     self.words[word] = True # I could have made this a set() instead.
+
+    # This function should return the positions of guess_letter in word. For instance:
+    def find_letter_positions(self, word:str, guess_letter:str) ->list[int]:
+        idx = word.find(guess_letter)
+        ret = []
+        while idx != -1:
+            ret.append(idx)
+            idx = word.find(guess_letter, idx + 1)
+        return ret
+
+class WordMakerHuman(WordMakerBase):
+    def __init__(self, words_file, verbose):
+        # Used inheritance b/c Human & AI class both use same functionality for __init__
+        # Requires 'verbose' to be passed
+        super().__init__(words_file, verbose)
 
     def reset(self, word_length):
         # Your AI code should not call input() or print().
@@ -45,17 +61,13 @@ class WordMakerHuman():
         return 1 # the only possible word is self.word
 
     def guess(self, guess_letter):
-        idx = self.word.find(guess_letter)
-        ret = []
-        while idx != -1:
-            ret.append(idx)
-            idx = self.word.find(guess_letter, idx + 1)
-        return ret
+        # Used inheritance b/c Human & AI class both use same functionality for find_letter_positions
+        return self.find_letter_positions(self.word, guess_letter)
 
 
 
 
-class WordMakerAI():
+class WordMakerAI(WordMakerBase):
     """
     A new WordMakerAI is instantiated every time you launch the game with evil_hangman.py.
     (However, the test harness can make multiple instances.)
@@ -74,15 +86,9 @@ class WordMakerAI():
         # Feel free to use this parameter to toggle extra print statments. Verbose mode can be turned on via the --verbose flag.
         self.verbose = verbose
 
-        # Use this code if you like.
-        """
-        with open(words_file) as file_obj:
-            for line in file_obj:
-                word = line.strip()
-                # Use word
-        """
-
-        pass # TODO: implement this
+        # Used inheritance b/c Human & AI class both use same functionality for __init__
+        # Optional for 'verbose' to pass, defaults to false if user doesn't input 'verbose'
+        super().__init__(words_file, verbose)
 
     def reset(self, word_length: int) -> None:
         # This function starts a new game with a word length of `word_length`. This will always be called before guess() or get_valid_word() are called.
@@ -115,6 +121,8 @@ class WordMakerAI():
         # Note: to convert from a list to a tuple, call tuple() on the list. For instance:
         result = []
         # TODO: add letter positions to result
+        # Used inheritance b/c Human & AI class both use same functionality for find_letter_positions
+        result = self.find_letter_positions(word, guess_letter)
         return tuple(result)
         
 
