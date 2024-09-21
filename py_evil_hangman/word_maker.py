@@ -20,9 +20,11 @@ class WordMakerBase:
     def __init__(self, words_file, verbose):
         # we need to prompt the player for a word, then clear the screen so that player 2 doesn't see the word.
         self.verbose = verbose
+        # Edge Case: Words repeated in the text file
         self.words = {} # Make sure that you understand dictionaries. They will be extremely useful for this project.
         with open(words_file) as wordfile:
             for line in wordfile:
+                # Edge Case: spaces/tabs in lines
                 word = line.strip().lower()
                 if len(word) > 0:
                     # I don't think we need "True" as a value. We need the beginning of the function though to see whether to add a word or ignore an empty line
@@ -161,5 +163,29 @@ class WordMakerAI(WordMakerBase):
 
         # The order of the returned list should be sorted. You can assume that 'guess_letter' has not been seen yet since the last call to self.reset(),
         #  and that guess_letter has len of 1 and is a lowercase a-z letter.
-        
-        pass # TODO: implement this
+
+        # Groups the words depending on what the guess letter is
+        # key = position(s) of guess letter, value = guess letter that are the same position & no. of times appearing as other words
+        words_group_by_guess_letter = defaultdict(set)  # Automatically creates a set if key is missing
+        for word in self.words:
+                positions = self.get_letter_positions_in_word(word, guess_letter)
+                words_group_by_guess_letter[positions].add(word)
+
+        # Getting the set(s) that are the max set length
+        # Edge Case 1: if multiple sets have the max set length, pick the set that has the least amount of the guess letter (i.e. least amount of integers in the key)
+        # Edge Case 2: After edge case 1, if there are multiple tuples with the min key (i.e. (baab, caac, daad), (aabb, aacc, aadd)), which set is chosen?
+        # Edge Case 2 not in code
+        max_length = 0
+        max_key = None
+        max_set = set()
+        for key, value in words_group_by_guess_letter.items():
+            length = len(value)
+            # Finding the max set length to increase the amount of available words in the dictionary
+            if length > max_length:
+                max_key, max_set = key, value
+                max_length = length
+            # Edge Case 1
+            elif length == max_length and len(max_key) > len(key):
+                max_key, max_set = key, value
+        self.words = max_set
+        return sorted(list(max_key))
