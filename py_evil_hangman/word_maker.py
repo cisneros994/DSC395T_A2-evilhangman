@@ -195,4 +195,5 @@ class WordMakerAI(WordMakerBase):
                 max_key, max_set = key, value
         self.words = max_set
 
-        return sorted(list(max_key))
+        # return sorted(list(max_key)) #O(nlogn)
+        return list(max_key) # O(n)
