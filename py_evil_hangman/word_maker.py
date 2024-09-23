@@ -114,7 +114,11 @@ class WordMakerAI(WordMakerBase):
         # Get a valid word in the active dictionary, to return when you lose
         # Can return any word, as long as it satisfies the previous guesses
 
-        pass # TODO: implement this
+        # O(1)
+        if len(self.words) != 0:
+            return next(iter(self.words))
+        else:
+            pass
 
     def get_amount_of_valid_words(self) -> int:
         # This function gets the total amount of possible words "remaining" (i.e., that satisfy all the guesses since self.reset was last called)
@@ -123,7 +127,8 @@ class WordMakerAI(WordMakerBase):
         # via the provided test cases.
         # You can see this number by running with the verbose flag, i.e. `python3 evil_hangman.py --verbose`
 
-        pass # TODO: implement this
+        # O(1)
+        return len(self.words)
 
     def get_letter_positions_in_word(self, word: str, guess_letter: str) -> tuple[int, ...]:
         # This function should return the positions of guess_letter in word. For instance:
@@ -173,8 +178,9 @@ class WordMakerAI(WordMakerBase):
 
         # Getting the set(s) that are the max set length
         # Edge Case 1: if multiple sets have the max set length, pick the set that has the least amount of the guess letter (i.e. least amount of integers in the key)
-        # Edge Case 2: After edge case 1, if there are multiple tuples with the min key (i.e. (baab, caac, daad), (aabb, aacc, aadd)), which set is chosen?
+        # Edge Case 2: After edge case 1, if there are multiple tuples with the min key (i.e. (baab, caac, daad), (aabb, aacc, aadd)), which set is chosen? (Count the number of vowels in string?)
         # Edge Case 2 not in code
+        # (need to sort set length, then pop() longest set to make this code more efficient? O(n) (for loop) vs O(nlogn) (for merge/quicksort) )
         max_length = 0
         max_key = None
         max_set = set()
@@ -188,4 +194,5 @@ class WordMakerAI(WordMakerBase):
             elif length == max_length and len(max_key) > len(key):
                 max_key, max_set = key, value
         self.words = max_set
+        test = self.get_valid_word()
         return sorted(list(max_key))
