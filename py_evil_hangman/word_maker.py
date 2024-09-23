@@ -194,5 +194,4 @@ class WordMakerAI(WordMakerBase):
             elif length == max_length and len(max_key) > len(key):
                 max_key, max_set = key, value
         self.words = max_set
-        test = self.get_valid_word()
         return sorted(list(max_key))
