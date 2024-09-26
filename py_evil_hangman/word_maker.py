@@ -107,6 +107,8 @@ class WordMakerAI(WordMakerBase):
 
         # Narrow down dictionary to only include words with word_length. Convert dictionary to set.
         # not sure how to make this 0(1) w/o preprocessing beforehand in __init__
+        # this is ok - it's just referring to not redoing the preprocessing in the reset function - becuase if the game was
+        # replayed many times that would be inefficient. It'll just have to load on initialization now.
         self.word = ""
         self.words = self.words_group_by_length[word_length]
 
@@ -115,10 +117,9 @@ class WordMakerAI(WordMakerBase):
         # Can return any word, as long as it satisfies the previous guesses
 
         # O(1)
-        if len(self.words) != 0:
-            return next(iter(self.words))
-        else:
-            pass
+        # Removed if else here - this will only call when game ends
+        return next(iter(self.words))
+
 
     def get_amount_of_valid_words(self) -> int:
         # This function gets the total amount of possible words "remaining" (i.e., that satisfy all the guesses since self.reset was last called)
@@ -138,7 +139,6 @@ class WordMakerAI(WordMakerBase):
 
         # Note: to convert from a list to a tuple, call tuple() on the list. For instance:
         result = []
-        # TODO: add letter positions to result
         # Used inheritance b/c Human & AI class both use same functionality for find_letter_positions
         result = self.find_letter_positions(word, guess_letter)
         return tuple(result)
@@ -178,9 +178,11 @@ class WordMakerAI(WordMakerBase):
 
         # Getting the set(s) that are the max set length
         # Edge Case 1: if multiple sets have the max set length, pick the set that has the least amount of the guess letter (i.e. least amount of integers in the key)
-        # Edge Case 2: After edge case 1, if there are multiple tuples with the min key (i.e. (baab, caac, daad), (aabb, aacc, aadd)), which set is chosen? (Count the number of vowels in string?)
-        # Edge Case 2 not in code
-        # (need to sort set length, then pop() longest set to make this code more efficient? O(n) (for loop) vs O(nlogn) (for merge/quicksort) )
+        # Edge Case 2: After edge case 1, if there are multiple tuples with the min key (i.e. (baab, caac, daad), (aabb, aacc, aadd)), choose first set. Does not matter which is chosen.
+        # TODO: (need to sort set length, then pop() longest set to make this code more efficient? O(n) (for loop) vs O(nlogn) (for merge/quicksort) )
+        # This for loop is definitely O(n). The only other potentially more efficient option would be to use the max() function,
+        # since that is slightly more optimized. BUT because we have to account for a second comparison (if multiple max values)
+        # we can't do that without adding an additional comparison function that will make it overall less efficient than the for loop
         max_length = 0
         max_key = None
         max_set = set()
